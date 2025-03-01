@@ -31,6 +31,24 @@ You'll need to set the following environment variables in your Vercel project:
 - `DB_SSL`: Set to "true" if your database requires SSL connection (most cloud databases do)
 - `NODE_ENV`: Set to "production" for deployment
 
+## SSL Configuration for Neon PostgreSQL
+
+Neon PostgreSQL requires a secure connection with SSL. The application is configured to use SSL with the following settings:
+
+```javascript
+ssl: {
+  rejectUnauthorized: false,
+  sslmode: 'require'
+}
+```
+
+This configuration is applied in:
+- `db/index.js`: Main database connection
+- `scripts/migrate.js`: Database migration script
+- `scripts/seed.js`: Database seeding script
+
+The `vercel.json` file includes an environment variable `DB_SSL: "true"` to ensure SSL is enabled during deployment.
+
 ## Deployment Steps
 
 ### Using Vercel Dashboard

@@ -8,9 +8,10 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
-  ssl: process.env.DB_SSL === 'true' ? {
-    rejectUnauthorized: false
-  } : false
+  ssl: {
+    rejectUnauthorized: false,
+    sslmode: 'require'
+  }
 });
 
 // Sample destination data
@@ -522,7 +523,7 @@ const destinations = [
       'The memorial site includes the last remaining section of the Berlin Wall.',
       'It features the Documentation Center with exhibitions on the history of the wall.',
       'The Chapel of Reconciliation stands on the site of a former church that was destroyed by the wall.',
-      'The memorial serves as a symbol of German reunification and the end of the Cold War.'
+      'I serves as a symbol of German reunification and the end of the Cold War.'
     ]
   },
   {
@@ -878,7 +879,7 @@ const destinations = [
       'The garden\'s meaning and design are open to interpretation.'
     ],
     facts: [
-      'I was originally a villa of the Fujiwara clan in the Heian period (794–1185).',
+      'I was originally built as a villa of the Fujiwara clan in the Heian period (794–1185).',
       'The rock garden dates from the late 15th century.',
       'The garden consists of 15 rocks arranged in groups on white gravel.',
       'From any vantage point, only 14 of the 15 rocks can be seen.',
@@ -956,7 +957,7 @@ const destinations = [
       'My summit is approximately 1,085 meters (3,560 feet) above sea level.',
       'I is home to a rich diversity of plant and animal life, part of the Cape Floral Region.',
       'The cable car provides panoramic views of Cape Town and the surrounding coastline.',
-      'Hiking trails range from easy walks to challenging climbs.',
+      'Hiking trails around me provide closer encounters with nature.',
       'I National Park is a protected area and popular recreation destination.'
     ]
   },
