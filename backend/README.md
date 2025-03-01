@@ -14,6 +14,9 @@ The repository includes the following configuration files for Vercel deployment:
 
 - `vercel.json`: Configures the build settings and routing for the Vercel deployment
 - `env.example`: Example environment variables needed for the application
+- `scripts/migrate.js`: Script to create database tables
+- `scripts/seed.js`: Script to populate the database with initial data
+- `scripts/deploy.js`: Script that runs both migration and seeding during deployment
 
 ## Environment Variables
 
@@ -25,6 +28,7 @@ You'll need to set the following environment variables in your Vercel project:
 - `DB_HOST`: PostgreSQL database host
 - `DB_PORT`: PostgreSQL database port (usually 5432)
 - `DB_DATABASE`: PostgreSQL database name
+- `DB_SSL`: Set to "true" if your database requires SSL connection (most cloud databases do)
 - `NODE_ENV`: Set to "production" for deployment
 
 ## Deployment Steps
@@ -37,7 +41,7 @@ You'll need to set the following environment variables in your Vercel project:
 4. Import your repository
 5. Configure the project:
    - Set the root directory to the backend folder
-   - Set the build command to `npm install`
+   - The build command will automatically be set to `npm run vercel-build` (which runs the database migration and seeding)
    - Set the output directory to `.`
 6. Add the environment variables listed above
 7. Click "Deploy"
@@ -66,49 +70,28 @@ You'll need to set the following environment variables in your Vercel project:
 
 5. Follow the prompts to configure your project
 
-## Database Setup
+## Database Migration and Seeding
 
-Before your application will work, you need to set up your database:
+The deployment process automatically handles database migration and seeding:
 
-1. Create a PostgreSQL database
-2. Run the database migration scripts:
-   ```sql
-   -- Create tables
-   CREATE TABLE IF NOT EXISTS destinations (
-     id SERIAL PRIMARY KEY,
-     name VARCHAR(255) NOT NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+1. During the build phase, Vercel will run `npm run vercel-build`
+2. This command executes `scripts/deploy.js`
+3. The deploy script runs:
+   - `scripts/migrate.js` to create the database tables if they don't exist
+   - `scripts/seed.js` to populate the database with initial data (only if the database is empty)
 
-   CREATE TABLE IF NOT EXISTS clues (
-     id SERIAL PRIMARY KEY,
-     destination_id INTEGER REFERENCES destinations(id) ON DELETE CASCADE,
-     text TEXT NOT NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+If you need to run these scripts manually:
 
-   CREATE TABLE IF NOT EXISTS facts (
-     id SERIAL PRIMARY KEY,
-     destination_id INTEGER REFERENCES destinations(id) ON DELETE CASCADE,
-     text TEXT NOT NULL,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+```bash
+# Run migrations
+npm run migrate
 
-   CREATE TABLE IF NOT EXISTS users (
-     id UUID PRIMARY KEY,
-     username VARCHAR(255) NOT NULL UNIQUE,
-     score INTEGER DEFAULT 0,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
+# Run seed
+npm run seed
 
-   CREATE TABLE IF NOT EXISTS challenges (
-     id UUID PRIMARY KEY,
-     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-   );
-   ```
-
-3. Seed your database with initial data
+# Run both (deploy)
+npm run deploy
+```
 
 ## Connecting Frontend to Deployed Backend
 
@@ -128,6 +111,7 @@ const config = {
 - **CORS Issues**: If you encounter CORS issues, make sure your backend CORS configuration allows requests from your frontend domain
 - **Database Connection Issues**: Verify your database connection string and credentials
 - **Deployment Failures**: Check the Vercel deployment logs for error messages
+- **Migration/Seed Errors**: If you encounter errors during migration or seeding, check the Vercel build logs
 
 ## Additional Resources
 
