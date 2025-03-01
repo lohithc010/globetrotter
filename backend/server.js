@@ -23,17 +23,31 @@ const PORT = process.env.PORT || 5000;
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost');
 
 // CORS configuration
+// Allow specific origins or all origins if FRONTEND_URL is not set
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? [process.env.FRONTEND_URL, 'http://localhost:3000', 'https://localhost:3000'] 
+  : '*';
+
+console.log('CORS allowed origins:', allowedOrigins);
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [/\.vercel\.app$/, /localhost/] // Allow Vercel domains and localhost
-    : '*', // Allow any origin in development
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Handle OPTIONS requests for CORS preflight
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.sendStatus(200);
+});
 
 // Routes
 app.use('/api/destinations', destinationRoutes);

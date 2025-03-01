@@ -30,6 +30,7 @@ You'll need to set the following environment variables in your Vercel project:
 - `DB_DATABASE`: PostgreSQL database name
 - `DB_SSL`: Set to "true" if your database requires SSL connection (most cloud databases do)
 - `NODE_ENV`: Set to "production" for deployment
+- `FRONTEND_URL`: (Optional) The URL of your frontend application for CORS configuration
 
 ## SSL Configuration for Neon PostgreSQL
 
@@ -48,6 +49,27 @@ This configuration is applied in:
 - `scripts/seed.js`: Database seeding script
 
 The `vercel.json` file includes an environment variable `DB_SSL: "true"` to ensure SSL is enabled during deployment.
+
+## CORS Configuration
+
+The application is configured to handle Cross-Origin Resource Sharing (CORS) in the following ways:
+
+1. **Express CORS Middleware**:
+   - The server uses the `cors` package to handle CORS requests
+   - It accepts requests from all origins (`*`) if no `FRONTEND_URL` is specified
+   - If `FRONTEND_URL` is set, it will only accept requests from that URL and localhost
+
+2. **Vercel.json Headers**:
+   - CORS headers are also set in the `vercel.json` file to ensure they are properly applied in the Vercel environment
+   - This provides a fallback in case the Express middleware doesn't handle all cases
+
+3. **OPTIONS Preflight Handling**:
+   - A specific handler for OPTIONS requests ensures preflight requests are properly handled
+
+If you're experiencing CORS issues:
+- Make sure your frontend is making requests to the correct backend URL
+- Set the `FRONTEND_URL` environment variable in your Vercel project to match your frontend's URL
+- Check that your frontend includes the proper headers in its requests
 
 ## Deployment Steps
 
